@@ -3,7 +3,6 @@ package com.screenlight.main;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,7 +13,7 @@ import android.widget.Toast;
 
 public class ScreenLight extends Activity {
 	public static final String TAG = "ScreenLight";
-	private static final int MIN_LIGHT = 30;
+	private static final int MIN_LIGHT = 50;
 	private static final int MAX_LIGHT = 255;
 	private PowerManager pm;
 	private PowerManager.WakeLock wakeLock;
@@ -25,7 +24,7 @@ public class ScreenLight extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.screen_light);
 		seekBar = (SeekBar) findViewById(R.id.seekbar);
-		seekBar.setMax(MAX_LIGHT - MIN_LIGHT);
+		seekBar.setMax(MAX_LIGHT);
 		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
@@ -40,14 +39,17 @@ public class ScreenLight extends Activity {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress,
 					boolean fromUser) {
-				processBrightness(progress);
+				int brightness = progress;
+				if (brightness < MIN_LIGHT) {
+					brightness = MIN_LIGHT;
+				}
+				processBrightness(brightness);
 			}
 		});
 		lightOn();
 	}
 
 	private void lightOn() {
-		Log.i(TAG, "light on");
 		pm = (PowerManager) getSystemService(POWER_SERVICE);
 		wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK,
 				"screen light");
@@ -55,7 +57,6 @@ public class ScreenLight extends Activity {
 	}
 
 	private void lightOut() {
-		Log.i("ScreenLight", "light out");
 		if (wakeLock != null) {
 			wakeLock.release();
 			wakeLock = null;
@@ -63,16 +64,9 @@ public class ScreenLight extends Activity {
 	}
 
 	private void processBrightness(int brightness) {
-		Log.i(TAG, "brightness " + brightness);
 		LayoutParams lp = getWindow().getAttributes();
 		lp.screenBrightness = brightness / 255.0f;
 		getWindow().setAttributes(lp);
-	}
-
-	@Override
-	protected void onPause() {
-		lightOut();
-		super.onPause();
 	}
 
 	@Override
