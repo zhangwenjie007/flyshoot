@@ -3,6 +3,7 @@ package com.screenlight.main;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,10 +47,23 @@ public class ScreenLight extends Activity {
 				processBrightness(brightness);
 			}
 		});
+
+	}
+
+	@Override
+	protected void onResume() {
 		lightOn();
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		lightOut();
+		super.onPause();
 	}
 
 	private void lightOn() {
+		Log.i(TAG, "light on");
 		pm = (PowerManager) getSystemService(POWER_SERVICE);
 		wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK,
 				"screen light");
@@ -58,6 +72,7 @@ public class ScreenLight extends Activity {
 
 	private void lightOut() {
 		if (wakeLock != null) {
+			Log.i(TAG, "light out");
 			wakeLock.release();
 			wakeLock = null;
 		}
