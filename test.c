@@ -3,6 +3,7 @@
 int main(int argc, char **argv)
 {
 	printf("hello,world!\n");
+	printf("this is zhangwenjie test!\n");
 	return 0;
 }
 
